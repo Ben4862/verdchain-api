@@ -7,7 +7,7 @@ import { generateVerifyQR } from "../services/qr.js";
 
 export const anchorFileRouter = Router();
 
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({ storage: multer.memoryStorage() }).any();
 
 function hashBuffer(buffer) {
   return "0x" + crypto.createHash("sha256").update(buffer).digest("hex");
@@ -21,13 +21,13 @@ async function signHash(hexHash) {
   return { signer: wallet.address, signature: sig };
 }
 
-anchorFileRouter.post("/", upload.single("file"), async function(req, res, next) {
+anchorFileRouter.post("/", upload, async function(req, res, next) {
   try {
     var buffer;
     var filename;
-    if (req.file) {
-      buffer = req.file.buffer;
-      filename = req.file.originalname || "capture.jpg";
+    if (req.files && req.files.length > 0) {
+      buffer = req.files[0].buffer;
+      filename = req.files[0].originalname || "capture.jpg";
     } else if (req.body && req.body.data) {
       buffer = Buffer.from(req.body.data, "base64");
       filename = req.body.filename || "capture.jpg";
