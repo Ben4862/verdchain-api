@@ -9,7 +9,6 @@ const ABI = [
 ];
 
 let _provider = null;
-let _contract = null;
 
 export function getProvider() {
   if (!_provider) {
@@ -34,16 +33,16 @@ export function getContract(withSigner = false) {
 }
 
 export async function anchorEvidence(hexHash, signature, metadata) {
-  const contract    = getContract(true);
-  const metaStr     = typeof metadata === "string" ? metadata : JSON.stringify(metadata);
+  const contract = getContract(true);
+  const metaStr = typeof metadata === "string" ? metadata : JSON.stringify(metadata);
   const gasEstimate = await contract.anchor.estimateGas(hexHash, signature, metaStr);
-  const gasLimit    = (gasEstimate * 120n) / 100n;
-  const tx          = await contract.anchor(hexHash, signature, metaStr, { gasLimit });
-  const receipt     = await tx.wait(1);
+  const gasLimit = (gasEstimate * 120n) / 100n;
+  const tx = await contract.anchor(hexHash, signature, metaStr, { gasLimit });
+  const receipt = await tx.wait(1);
   return {
-    txHash:      receipt.hash,
+    txHash: receipt.hash,
     blockNumber: receipt.blockNumber,
-    anchoredAt:  Math.floor(Date.now() / 1000),
+    anchoredAt: Math.floor(Date.now() / 1000),
   };
 }
 
@@ -52,6 +51,48 @@ export async function verifyEvidence(hexHash, { full = false } = {}) {
   const [exists, signer, custodian, anchoredAt] = await contract.verify(hexHash);
   if (!exists) return { exists: false };
   const result = {
-    exists: true, signer, custodian,
-    anchoredAt:    Number(anchoredAt),
-    anchoredAtISO: new Date(Num
+    exists: true,
+    signer,
+    custodian,
+    anchoredAt: Number(anchoredAt),
+    anchoredAtISO: new Date(Number(anchoredAt) * 1000).toISOString(),
+  };
+  if (full) {
+    const [record, log] = await Promise.all([
+      contract.getRecord(hexHash),
+      contract.getCustodyLog(hexHash),
+    ]);
+    result.record = {
+      hash: record.hash,
+      signer: record.signer,
+      blockNumber: Number(record.blockNumber),
+      metadata: (() => { try { return JSON.parse(record.metadata); } catch (e) { return record.metadata; } })(),
+    };
+    result.custodyLog = log.map(function(e) {
+      return {
+        from: e.from,
+        to: e.to,
+        timestamp: Number(e.timestamp),
+        timestampISO: new Date(Number(e.timestamp) * 1000).toISOString(),
+        note: e.note,
+      };
+    });
+  }
+  return result;
+}
+
+export async function getTotalAnchored() {
+  const contract = getContract();
+  return Number(await contract.totalAnchored());
+}
+
+export async function checkConnection() {
+  try {
+    const provider = getProvider();
+    const block = await provider.getBlockNumber();
+    const network = await provider.getNetwork();
+    return { ok: true, blockNumber: block, chainId: Number(network.chainId) };
+  } catch (err) {
+    return { ok: false, error: err.message };
+  }
+}
