@@ -1,6 +1,6 @@
-require("@nomicfoundation/hardhat-ethers");
+import "@nomicfoundation/hardhat-ethers";
 
-module.exports = {
+export default {
   solidity: "0.8.20",
   networks: {
     polygon: {
