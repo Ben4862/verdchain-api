@@ -1,9 +1,9 @@
-import { ethers } from "hardhat";
+const hre = require("hardhat");
 
 async function main() {
-  const [deployer] = await ethers.getSigners();
+  const [deployer] = await hre.ethers.getSigners();
   console.log("Deploying from:", deployer.address);
-  const Factory = await ethers.getContractFactory("EvidenceAnchor");
+  const Factory = await hre.ethers.getContractFactory("EvidenceAnchor");
   const contract = await Factory.deploy();
   await contract.waitForDeployment();
   const address = await contract.getAddress();
