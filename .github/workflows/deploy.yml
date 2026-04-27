@@ -10,6 +10,6 @@ jobs:
         with:
           node-version: '22'
       - run: npm install --save-dev hardhat @nomicfoundation/hardhat-ethers ethers dotenv
-      - run: npx hardhat run scripts/deploy.js --network polygon
+      - run: npx hardhat --config hardhat.config.cjs run scripts/deploy.js --network polygon
         env:
           DEPLOYER_PRIVATE_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
