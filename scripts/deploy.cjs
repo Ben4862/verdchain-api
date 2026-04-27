@@ -8,7 +8,7 @@ async function main() {
     throw new Error("DEPLOYER_PRIVATE_KEY not set");
   }
   
-  const provider = new ethers.JsonRpcProvider("https://polygon-mainnet.g.alchemy.com/v2/demo");
+  const provider = new ethers.JsonRpcProvider(process.env.POLYGON_RPC_URL);
   const wallet = new ethers.Wallet(process.env.DEPLOYER_PRIVATE_KEY, provider);
   
   const balance = await provider.getBalance(wallet.address);
