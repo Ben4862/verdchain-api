@@ -1,0 +1,15 @@
+name: Deploy Contract
+on:
+  workflow_dispatch:
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+      - run: npm install --save-dev hardhat @nomicfoundation/hardhat-ethers ethers dotenv
+      - run: npx hardhat run scripts/deploy.js --network polygon
+        env:
+          DEPLOYER_PRIVATE_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
