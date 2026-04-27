@@ -9,7 +9,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '22'
-      - run: npm install --save-dev hardhat @nomicfoundation/hardhat-ethers ethers
-      - run: npx hardhat --config hardhat.config.js run scripts/deploy.mjs --network polygon
+      - run: npm install --save-dev hardhat@2.22.19 @nomicfoundation/hardhat-ethers@3 ethers@6
+      - run: npx hardhat --config hardhat.config.js run scripts/deploy.cjs --network polygon
         env:
           DEPLOYER_PRIVATE_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
