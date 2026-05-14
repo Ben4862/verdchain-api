@@ -2,22 +2,24 @@ import crypto from "crypto";
 
 const universities = new Map();
 
-const demoId = "uni_oxford";
+// Démo : organisme approuvé
+const demoId = "uni_ifas_demo";
 universities.set(demoId, {
   id: demoId,
-  name: "Oxford University",
-  email: "registrar@oxford.edu",
-  passwordHash: crypto.createHash("sha256").update("oxford123").digest("hex"),
+  name: "IFAS Centre-Val de Loire",
+  email: "formation@ifas-demo.fr",
+  passwordHash: crypto.createHash("sha256").update("demo123").digest("hex"),
   status: "approved",
   createdAt: new Date().toISOString(),
 });
 
-const pendingId = "uni_cambridge";
+// Démo : organisme en attente (pour tester le panel admin)
+const pendingId = "uni_ars_normandie";
 universities.set(pendingId, {
   id: pendingId,
-  name: "Cambridge University",
-  email: "admin@cambridge.edu",
-  passwordHash: crypto.createHash("sha256").update("cambridge123").digest("hex"),
+  name: "ARS Normandie — IFAS Rouen",
+  email: "certification@ifas-rouen.fr",
+  passwordHash: crypto.createHash("sha256").update("rouen123").digest("hex"),
   status: "pending",
   createdAt: new Date().toISOString(),
 });
@@ -28,7 +30,14 @@ export function registerUniversity({ name, email, password }) {
   }
   const id = "uni_" + crypto.randomBytes(8).toString("hex");
   const passwordHash = crypto.createHash("sha256").update(password).digest("hex");
-  const university = { id, name, email, passwordHash, status: "pending", createdAt: new Date().toISOString() };
+  const university = {
+    id,
+    name,
+    email,
+    passwordHash,
+    status: "pending",
+    createdAt: new Date().toISOString(),
+  };
   universities.set(id, university);
   return university;
 }
