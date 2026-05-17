@@ -1,15 +1,19 @@
-import express from "express";
-import cors from "cors";
-import helmet from "helmet";
-import morgan from "morgan";
-import { anchorRouter } from "./routes/anchor.js";
-import { anchorFileRouter } from "./routes/anchorFile.js";
-import { anchorDocRouter } from "./routes/anchorDoc.js";
-import { verifyRouter } from "./routes/verify.js";
-import { healthRouter } from "./routes/health.js";
-import { universitiesRouter } from "./routes/universities.js";
-import { errorHandler } from "./middleware/errorHandler.js";
-import { rateLimiter } from "./middleware/rateLimiter.js";
+import express    from "express";
+import cors      from "cors";
+import helmet    from "helmet";
+import morgan    from "morgan";
+import { anchorRouter }      from "./routes/anchor.js";
+import { anchorFileRouter }  from "./routes/anchorFile.js";
+import { anchorDocRouter }   from "./routes/anchorDoc.js";
+import { verifyRouter }      from "./routes/verify.js";
+import { healthRouter }      from "./routes/health.js";
+import { universitiesRouter }from "./routes/universities.js";
+import { authRouter }        from "./routes/auth.js";
+import { credentialsRouter } from "./routes/credentials.js";
+import { adminRouter }       from "./routes/admin.js";
+import { auditRouter }       from "./routes/audit.js";
+import { errorHandler }      from "./middleware/errorHandler.js";
+import { rateLimiter }       from "./middleware/rateLimiter.js";
 
 const app = express();
 
@@ -19,12 +23,19 @@ app.use(morgan("combined"));
 app.use(express.json({ limit: "1mb" }));
 app.use(rateLimiter);
 
+// Legacy routes (kept for backward compat)
 app.use("/api/health",       healthRouter);
 app.use("/api/anchor",       anchorRouter);
 app.use("/api/anchor-file",  anchorFileRouter);
 app.use("/api/anchor-doc",   anchorDocRouter);
 app.use("/api/verify",       verifyRouter);
 app.use("/api/universities", universitiesRouter);
+
+// Phase 1 — JWT-based API
+app.use("/api/auth",         authRouter);
+app.use("/api/credentials",  credentialsRouter);
+app.use("/api/admin",        adminRouter);
+app.use("/api/audit",        auditRouter);
 
 app.use((req, res) => res.status(404).json({ error: "Not found" }));
 app.use(errorHandler);

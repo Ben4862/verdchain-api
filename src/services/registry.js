@@ -2,7 +2,6 @@ import crypto from "crypto";
 
 const universities = new Map();
 
-// Démo : organisme approuvé
 const demoId = "uni_ifas_demo";
 universities.set(demoId, {
   id: demoId,
@@ -10,10 +9,11 @@ universities.set(demoId, {
   email: "formation@ifas-demo.fr",
   passwordHash: crypto.createHash("sha256").update("demo123").digest("hex"),
   status: "approved",
+  country: "Centre-Val de Loire",
+  website: "https://ifas-demo.fr",
   createdAt: new Date().toISOString(),
 });
 
-// Démo : organisme en attente (pour tester le panel admin)
 const pendingId = "uni_ars_normandie";
 universities.set(pendingId, {
   id: pendingId,
@@ -21,21 +21,20 @@ universities.set(pendingId, {
   email: "certification@ifas-rouen.fr",
   passwordHash: crypto.createHash("sha256").update("rouen123").digest("hex"),
   status: "pending",
+  country: "Normandie",
   createdAt: new Date().toISOString(),
 });
 
-export function registerUniversity({ name, email, password }) {
+export function registerUniversity({ name, email, password, country = "", website = "" }) {
   for (const uni of universities.values()) {
     if (uni.email === email) throw Object.assign(new Error("email_taken"), { status: 409 });
   }
   const id = "uni_" + crypto.randomBytes(8).toString("hex");
-  const passwordHash = crypto.createHash("sha256").update(password).digest("hex");
   const university = {
-    id,
-    name,
-    email,
-    passwordHash,
+    id, name, email,
+    passwordHash: crypto.createHash("sha256").update(password).digest("hex"),
     status: "pending",
+    country, website,
     createdAt: new Date().toISOString(),
   };
   universities.set(id, university);
@@ -43,9 +42,9 @@ export function registerUniversity({ name, email, password }) {
 }
 
 export function loginUniversity({ email, password }) {
-  const passwordHash = crypto.createHash("sha256").update(password).digest("hex");
+  const ph = crypto.createHash("sha256").update(password).digest("hex");
   for (const uni of universities.values()) {
-    if (uni.email === email && uni.passwordHash === passwordHash) return uni;
+    if (uni.email === email && uni.passwordHash === ph) return uni;
   }
   return null;
 }
@@ -54,9 +53,7 @@ export function getPendingUniversities() {
   return [...universities.values()].filter(u => u.status === "pending");
 }
 
-export function getUniversity(id) {
-  return universities.get(id);
-}
+export function getUniversity(id) { return universities.get(id); }
 
 export function approveUniversity(id) {
   const uni = universities.get(id);
