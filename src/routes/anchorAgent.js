@@ -3,16 +3,16 @@ import { ethers } from "ethers";
 import { anchorEvidence } from "../services/blockchain.js";
 import { generateVerifyQR } from "../services/qr.js";
 import { normaliseHash } from "../utils/validate.js";
-import { uniAuth } from "../middleware/uniAuth.js";
+import { issuerAuth } from "../middleware/issuerAuth.js";
 
-export const anchorDocRouter = Router();
+export const anchorAgentRouter = Router();
 
-anchorDocRouter.post("/", uniAuth, async (req, res, next) => {
+anchorAgentRouter.post("/", issuerAuth, async (req, res, next) => {
   try {
-    const { hash, candidateName, date } = req.body;
+    const { hash, agentName, agentVersion, releaseDate } = req.body;
     if (!hash) return res.status(400).json({ error: "hash is required" });
-    if (!candidateName) return res.status(400).json({ error: "candidateName is required" });
-    if (!date) return res.status(400).json({ error: "date is required" });
+    if (!agentName) return res.status(400).json({ error: "agentName is required" });
+    if (!releaseDate) return res.status(400).json({ error: "releaseDate is required" });
 
     const hexHash = normaliseHash(hash);
     const key = process.env.OPERATOR_PRIVATE_KEY;
@@ -22,11 +22,12 @@ anchorDocRouter.post("/", uniAuth, async (req, res, next) => {
     const sig = await wallet.signMessage(ethers.getBytes(hexHash));
 
     const metadata = {
-      type: "academic_credential",
-      universityId: req.university.id,
-      universityName: req.university.name,
-      candidateName,
-      date,
+      type: "ai_agent_identity",
+      issuerId: req.issuer.id,
+      creatorName: req.issuer.name,
+      agentName,
+      agentVersion: agentVersion || "",
+      releaseDate,
     };
 
     const result = await anchorEvidence(hexHash, sig, metadata);
@@ -38,9 +39,10 @@ anchorDocRouter.post("/", uniAuth, async (req, res, next) => {
       txHash: result.txHash,
       blockNumber: result.blockNumber,
       verifyUrl: qr.url,
-      universityName: req.university.name,
-      candidateName,
-      date,
+      creatorName: req.issuer.name,
+      agentName,
+      agentVersion: agentVersion || "",
+      releaseDate,
     });
   } catch (err) {
     if (err.message?.includes("AlreadyAnchored")) {

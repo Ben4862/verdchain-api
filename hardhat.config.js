@@ -3,10 +3,10 @@ require("@nomicfoundation/hardhat-ethers");
 module.exports = {
   solidity: "0.8.20",
   networks: {
-    polygon: {
-      url: "https://polygon-rpc.com",
+    ethereum: {
+      url: process.env.ETHEREUM_RPC_URL || "https://eth.llamarpc.com",
       accounts: [process.env.DEPLOYER_PRIVATE_KEY],
-      chainId: 137,
+      chainId: 1,
     },
   },
 };

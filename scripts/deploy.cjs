@@ -8,12 +8,12 @@ async function main() {
     throw new Error("DEPLOYER_PRIVATE_KEY not set");
   }
   
-  const provider = new ethers.JsonRpcProvider(process.env.POLYGON_RPC_URL);
+  const provider = new ethers.JsonRpcProvider(process.env.ETHEREUM_RPC_URL || process.env.POLYGON_RPC_URL);
   const wallet = new ethers.Wallet(process.env.DEPLOYER_PRIVATE_KEY, provider);
-  
+
   const balance = await provider.getBalance(wallet.address);
   console.log("Deployer:", wallet.address);
-  console.log("Balance:", ethers.formatEther(balance), "POL");
+  console.log("Balance:", ethers.formatEther(balance), "ETH");
   
   const factory = new ethers.ContractFactory(ABI, BYTECODE, wallet);
   console.log("Deploying EvidenceAnchor...");
@@ -25,7 +25,7 @@ async function main() {
   const address = await contract.getAddress();
   
   console.log("Contract deployed to:", address);
-  console.log("Explorer: https://polygonscan.com/address/" + address);
+  console.log("Explorer: https://etherscan.io/address/" + address);
 }
 
 main().catch((e) => { console.error(e.message); process.exit(1); });

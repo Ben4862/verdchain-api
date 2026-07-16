@@ -12,8 +12,8 @@ let _provider = null;
 
 export function getProvider() {
   if (!_provider) {
-    const rpc = process.env.POLYGON_RPC_URL;
-    if (!rpc) throw new Error("POLYGON_RPC_URL not set");
+    const rpc = process.env.ETHEREUM_RPC_URL || process.env.POLYGON_RPC_URL;
+    if (!rpc) throw new Error("ETHEREUM_RPC_URL not set");
     _provider = new ethers.JsonRpcProvider(rpc);
   }
   return _provider;

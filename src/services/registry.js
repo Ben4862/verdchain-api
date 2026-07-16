@@ -1,70 +1,70 @@
 import crypto from "crypto";
 
-const universities = new Map();
+const issuers = new Map();
 
-const demoId = "uni_ifas_demo";
-universities.set(demoId, {
+const demoId = "iss_novaagents_demo";
+issuers.set(demoId, {
   id: demoId,
-  name: "IFAS Centre-Val de Loire",
-  email: "formation@ifas-demo.fr",
+  name: "NovaAgents Labs",
+  email: "dev@novaagents-demo.io",
   passwordHash: crypto.createHash("sha256").update("demo123").digest("hex"),
   status: "approved",
-  country: "Centre-Val de Loire",
-  website: "https://ifas-demo.fr",
+  sector: "Studio d'agents IA — Paris",
+  website: "https://novaagents-demo.io",
   createdAt: new Date().toISOString(),
 });
 
-const pendingId = "uni_ars_normandie";
-universities.set(pendingId, {
+const pendingId = "iss_agenthub";
+issuers.set(pendingId, {
   id: pendingId,
-  name: "ARS Normandie — IFAS Rouen",
-  email: "certification@ifas-rouen.fr",
-  passwordHash: crypto.createHash("sha256").update("rouen123").digest("hex"),
+  name: "AgentHub — Plateforme d'orchestration",
+  email: "certification@agenthub-demo.io",
+  passwordHash: crypto.createHash("sha256").update("hub123").digest("hex"),
   status: "pending",
-  country: "Normandie",
+  sector: "Plateforme d'agents IA — Lyon",
   createdAt: new Date().toISOString(),
 });
 
-export function registerUniversity({ name, email, password, country = "", website = "" }) {
-  for (const uni of universities.values()) {
-    if (uni.email === email) throw Object.assign(new Error("email_taken"), { status: 409 });
+export function registerIssuer({ name, email, password, sector = "", website = "" }) {
+  for (const issuer of issuers.values()) {
+    if (issuer.email === email) throw Object.assign(new Error("email_taken"), { status: 409 });
   }
-  const id = "uni_" + crypto.randomBytes(8).toString("hex");
-  const university = {
+  const id = "iss_" + crypto.randomBytes(8).toString("hex");
+  const issuer = {
     id, name, email,
     passwordHash: crypto.createHash("sha256").update(password).digest("hex"),
     status: "pending",
-    country, website,
+    sector, website,
     createdAt: new Date().toISOString(),
   };
-  universities.set(id, university);
-  return university;
+  issuers.set(id, issuer);
+  return issuer;
 }
 
-export function loginUniversity({ email, password }) {
+export function loginIssuer({ email, password }) {
   const ph = crypto.createHash("sha256").update(password).digest("hex");
-  for (const uni of universities.values()) {
-    if (uni.email === email && uni.passwordHash === ph) return uni;
+  for (const issuer of issuers.values()) {
+    if (issuer.email === email && issuer.passwordHash === ph) return issuer;
   }
   return null;
 }
 
-export function getPendingUniversities() {
-  return [...universities.values()].filter(u => u.status === "pending");
+export function getPendingIssuers() {
+  return [...issuers.values()].filter(i => i.status === "pending");
 }
 
-export function getUniversity(id) { return universities.get(id); }
+export function getIssuer(id) { return issuers.get(id); }
 
-export function approveUniversity(id) {
-  const uni = universities.get(id);
-  if (!uni) return null;
-  uni.status = "approved";
-  return uni;
+export function approveIssuer(id) {
+  const issuer = issuers.get(id);
+  if (!issuer) return null;
+  issuer.status = "approved";
+  return issuer;
 }
 
-export function rejectUniversity(id) {
-  const uni = universities.get(id);
-  if (!uni) return null;
-  universities.delete(id);
-  return uni;
+export function rejectIssuer(id) {
+  const issuer = issuers.get(id);
+  if (!issuer) return null;
+  issuers.delete(id);
+  return issuer;
 }

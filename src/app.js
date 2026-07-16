@@ -4,12 +4,12 @@ import helmet    from "helmet";
 import morgan    from "morgan";
 import { anchorRouter }      from "./routes/anchor.js";
 import { anchorFileRouter }  from "./routes/anchorFile.js";
-import { anchorDocRouter }   from "./routes/anchorDoc.js";
+import { anchorAgentRouter } from "./routes/anchorAgent.js";
 import { verifyRouter }      from "./routes/verify.js";
 import { healthRouter }      from "./routes/health.js";
-import { universitiesRouter }from "./routes/universities.js";
+import { issuersRouter }     from "./routes/issuers.js";
 import { authRouter }        from "./routes/auth.js";
-import { credentialsRouter } from "./routes/credentials.js";
+import { agentsRouter }      from "./routes/agents.js";
 import { adminRouter }       from "./routes/admin.js";
 import { auditRouter }       from "./routes/audit.js";
 import { errorHandler }      from "./middleware/errorHandler.js";
@@ -23,17 +23,17 @@ app.use(morgan("combined"));
 app.use(express.json({ limit: "1mb" }));
 app.use(rateLimiter);
 
-// Legacy routes (kept for backward compat)
+// Low-level anchoring routes (hash in, proof out)
 app.use("/api/health",       healthRouter);
 app.use("/api/anchor",       anchorRouter);
 app.use("/api/anchor-file",  anchorFileRouter);
-app.use("/api/anchor-doc",   anchorDocRouter);
+app.use("/api/anchor-agent", anchorAgentRouter);
 app.use("/api/verify",       verifyRouter);
-app.use("/api/universities", universitiesRouter);
+app.use("/api/issuers",      issuersRouter);
 
-// Phase 1 — JWT-based API
+// JWT-based API — AI agent identity certification
 app.use("/api/auth",         authRouter);
-app.use("/api/credentials",  credentialsRouter);
+app.use("/api/agents",       agentsRouter);
 app.use("/api/admin",        adminRouter);
 app.use("/api/audit",        auditRouter);
 

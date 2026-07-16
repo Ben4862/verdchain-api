@@ -27,7 +27,9 @@ export function validateAddress(addr) {
 export function sanitiseMetadata(meta) {
   if (!meta || typeof meta !== "object") return {};
   const allowed = ["device_id", "filename", "file_size", "captured_at",
-                   "captured_ts", "gps", "device_os", "hostname", "schema", "source"];
+                   "captured_ts", "gps", "device_os", "hostname", "schema", "source",
+                   "agent_name", "agent_version", "model_info", "release_date",
+                   "code_hash", "weights_hash", "creator"];
   const clean = {};
   for (const key of allowed) {
     if (meta[key] !== undefined) clean[key] = meta[key];

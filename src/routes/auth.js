@@ -1,7 +1,7 @@
 import { Router } from "express";
 import jwt       from "jsonwebtoken";
-import { loginUniversity, registerUniversity } from "../services/registry.js";
-import { addAuditEntry } from "../services/credentialStore.js";
+import { loginIssuer, registerIssuer } from "../services/registry.js";
+import { addAuditEntry } from "../services/identityStore.js";
 
 export const authRouter = Router();
 
@@ -18,25 +18,25 @@ authRouter.post("/login", (req, res) => {
     return res.json({ token, user: { role: "admin", email } });
   }
 
-  const uni = loginUniversity({ email, password });
-  if (!uni) return res.status(401).json({ error: "Identifiants incorrects" });
+  const issuer = loginIssuer({ email, password });
+  if (!issuer) return res.status(401).json({ error: "Identifiants incorrects" });
 
-  addAuditEntry(uni.id, "login", { email });
+  addAuditEntry(issuer.id, "login", { email });
 
-  const token = jwt.sign({ role: "issuer", uniId: uni.id, email: uni.email }, SECRET, { expiresIn: "8h" });
+  const token = jwt.sign({ role: "issuer", issuerId: issuer.id, email: issuer.email }, SECRET, { expiresIn: "8h" });
   return res.json({
     token,
-    issuer: { org_name: uni.name, email: uni.email, status: uni.status },
+    issuer: { org_name: issuer.name, email: issuer.email, status: issuer.status },
   });
 });
 
 authRouter.post("/register", (req, res) => {
-  const { email, password, org_name, country, website } = req.body;
+  const { email, password, org_name, sector, website } = req.body;
   if (!email || !password || !org_name)
     return res.status(400).json({ error: "Champs obligatoires manquants" });
   try {
-    const uni = registerUniversity({ name: org_name, email, password, country, website });
-    return res.status(201).json({ message: "Demande soumise. En attente de validation.", id: uni.id });
+    const issuer = registerIssuer({ name: org_name, email, password, sector, website });
+    return res.status(201).json({ message: "Demande soumise. En attente de validation.", id: issuer.id });
   } catch (err) {
     return res.status(err.status || 400).json({ error: err.message });
   }

@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+/// @title EvidenceAnchor — VerdChain AI agent identity anchor (Ethereum)
+/// @notice Anchors the SHA-256 fingerprint of an AI agent's identity record
+///         (source code, model weights, version, creator, provenance) so that
+///         any party can verify the agent is exactly what its creator certified.
 contract EvidenceAnchor {
 
     struct EvidenceRecord {

@@ -21,7 +21,7 @@ anchorFileRouter.post("/", async function(req, res, next) {
         var wallet = new ethers.Wallet(key);
         var msgBytes = ethers.getBytes(hexHash);
         var sig = await wallet.signMessage(msgBytes);
-        var metadata = { filename: "capture.jpg", file_size: buffer.length, captured_at: new Date().toISOString(), source: "ios_shortcut" };
+        var metadata = { filename: "agent-artifact.bin", file_size: buffer.length, captured_at: new Date().toISOString(), source: "agent_cli" };
         var result = await anchorEvidence(hexHash, sig, metadata);
         var qr = await generateVerifyQR(hexHash);
         return res.status(201).json({ status: "anchored", hash: hexHash, txHash: result.txHash, verifyUrl: qr.url });
